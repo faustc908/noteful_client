@@ -1,23 +1,23 @@
 import React from "react";
 import ApiContext from "../ApiContext";
-import config from '../config';
-import ValidationError from '../ValidationError'
-import './AddFolder.css'
-import PropTypes from 'prop-types';
+import config from "../config";
+import ValidationError from "../ValidationError";
+import "./AddFolder.css";
+import PropTypes from "prop-types";
 
 export default class AddFolder extends React.Component {
   static contextType = ApiContext;
 
   state = {
     error: null,
-    errorMessage: '',
+    errorMessage: "",
     name: {
-      value: ''
+      value: "",
     },
   };
 
   updateName(name) {
-    this.setState({name: {value: name}})
+    this.setState({ name: { value: name } });
   }
 
   handleSubmit = (event) => {
@@ -25,43 +25,42 @@ export default class AddFolder extends React.Component {
     const { name } = this.state;
     const newFolder = {
       name: name.value,
-    }
+    };
 
     if (name.value.trim().length === 0) {
       this.setState({
-        errorMessage: "Folder name is required"
-      })
-    } 
-    else {
-      this.setState({ error: null })
+        errorMessage: "Folder name is required",
+      });
+    } else {
+      this.setState({ error: null });
       fetch(`${config.API_ENDPOINT}/folders`, {
-        method: 'POST',
+        method: "POST",
         body: JSON.stringify(newFolder),
         headers: {
-          'content-type': 'application/json'
+          "content-type": "application/json",
         },
       })
-      .then(response => {
-        if (!response.ok) {
-          return response.json().then(error => {
-            throw error
-          })
-        }
-        return response.json()
-      })
-      .then(data => {
-        name.value = ''
-        this.context.addFolder(data)
-        this.props.history.push('/')
-      })
-      .catch(error => {
-        this.setState({ error })
-      })
+        .then((response) => {
+          if (!response.ok) {
+            return response.json().then((error) => {
+              throw error;
+            });
+          }
+          return response.json();
+        })
+        .then((data) => {
+          name.value = "";
+          this.context.addFolder(data);
+          this.props.history.push("/");
+        })
+        .catch((error) => {
+          this.setState({ error });
+        });
     }
-  }
+  };
 
   render() {
-    const {error} = this.state;
+    const { error } = this.state;
     const noteError = this.state.errorMessage;
     return (
       <ApiContext.Consumer>
@@ -74,12 +73,12 @@ export default class AddFolder extends React.Component {
               className="folder-control"
               name="folder"
               id="folder"
-              onChange={e => this.updateName(e.target.value)}
+              onChange={(e) => this.updateName(e.target.value)}
             />
             <button>Submit</button>
-            <div className='error' role='alert'>
+            <div className="error" role="alert">
               {error && <p>{error.message}</p>}
-              <ValidationError message={noteError}/>
+              <ValidationError message={noteError} />
             </div>
           </form>
         )}
@@ -88,7 +87,6 @@ export default class AddFolder extends React.Component {
   }
 }
 
-
 AddFolder.propTypes = {
-  name: PropTypes.string
+  name: PropTypes.string,
 };

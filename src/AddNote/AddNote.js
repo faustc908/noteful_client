@@ -1,49 +1,49 @@
 import React from "react";
 import ApiContext from "../ApiContext";
 import PropTypes from "prop-types";
-import './AddNote.css'
-import NotefulForm from '../NotefulForm/NotefulForm';
+import "./AddNote.css";
+import NotefulForm from "../NotefulForm/NotefulForm";
+import config from "../config";
 
 export default class AddNote extends React.Component {
   constructor() {
     super();
     this.state = {
       error: null,
-      name: '',
-      content: '',
-      id: '',
+      name: "",
+      content: "",
+      id: "",
       nameValid: false,
       idValid: false,
-      validationMessage: ''
+      validationMessage: "",
     };
   }
   static contextType = ApiContext;
   static defaultProps = {
-    folders: []
+    folders: [],
   };
 
-  isNameValid = event => {
+  isNameValid = (event) => {
     event.preventDefault();
     if (!this.state.name) {
       this.setState({
-        validationMessage: 'Note name can not be blank.',
-        nameValid: false
+        validationMessage: "Note name can not be blank.",
+        nameValid: false,
       });
     } else if (!this.state.id) {
       this.setState({
-        validationMessage: 'You must choose a valid folder.',
-        idValid: false
+        validationMessage: "You must choose a valid folder.",
+        idValid: false,
       });
-    } else if (!this.state.content){
+    } else if (!this.state.content) {
       this.setState({
-        validationMessage: 'You must add content'
+        validationMessage: "You must add content",
       });
-    }
-    else {
+    } else {
       this.setState(
         {
-          validationMessage: '',
-          nameValid: true
+          validationMessage: "",
+          nameValid: true,
         },
         () => {
           this.handleAddNote();
@@ -54,91 +54,90 @@ export default class AddNote extends React.Component {
 
   handleAddNote = () => {
     const options = {
-      method: 'POST',
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json'
+        "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        // id: cuid(),
         name: this.state.name,
         modified: new Date(),
         folderId: this.state.id,
-        content: this.state.content
-      })
+        content: this.state.content,
+      }),
     };
 
-    fetch('http://localhost:9090/notes', options)
-      .then(res => {
+    fetch(`${config.API_ENDPOINT}/notes`, options)
+      .then((res) => {
         if (!res.ok) {
-          throw new Error('Something went wrong');
+          throw new Error("Something went wrong");
         }
         return res;
       })
-      .then(res => res.json())
-      .then(data => {
-       this.context.addNote(data);
-       this.props.history.push('/')
+      .then((res) => res.json())
+      .then((data) => {
+        this.context.addNote(data);
+        this.props.history.push("/");
       })
-      .catch(err => {
+      .catch((err) => {
         this.setState({ error: err.message });
       });
   };
 
-  nameChange = letter => {
+  nameChange = (letter) => {
     this.setState({ name: letter });
   };
 
-  contentChange = letter => {
+  contentChange = (letter) => {
     this.setState({ content: letter });
   };
 
-  idChange = letter => {
+  idChange = (letter) => {
     this.setState({ id: letter });
   };
 
   render() {
     return (
-      <section className='AddNote'>
+      <section className="AddNote">
         <h2>Create a note</h2>
         <NotefulForm
-          onSubmit={event => {
+          onSubmit={(event) => {
             this.isNameValid(event);
           }}
         >
-          <div className='field' required>
-            <label htmlFor='note-name-input'>Name</label>
+          <div className="field" required>
+            <label htmlFor="note-name-input">Name</label>
             <input
-              type='text'
-              id='note-name-input'
-              name='note'
-              onChange={event => {
+              type="text"
+              id="note-name-input"
+              name="note"
+              onChange={(event) => {
                 this.nameChange(event.target.value);
               }}
             />
           </div>
           {!this.state.nameValid}
-          <div className='field' required>
-            <label htmlFor='note-content-input'>Content</label>
+          <div className="field" required>
+            <label htmlFor="note-content-input">Content</label>
             <textarea
-              id='note-content-input'
-              name='content'
-              onChange={event => {
+              id="note-content-input"
+              name="content"
+              onChange={(event) => {
                 this.contentChange(event.target.value);
               }}
             />
           </div>
-          <div className='field' required>
-            <label htmlFor='note-folder-select'>Folder</label>
+          <div className="field" required>
+            <label htmlFor="note-folder-select">Folder</label>
             <select
-              id='note-folder-select'
-              name='folder'
-              onChange={event => {
+              id="note-folder-select"
+              name="folder"
+              onChange={(event) => {
                 this.idChange(event.target.value);
               }}
             >
               <option value={null}>...</option>
-              {this.context.folders.map(folder => (
-                <option key={folder.name} name='folder' value={folder.id}>
+              {this.context.folders.map((folder) => (
+                <option key={folder.name} name="folder" value={folder.id}>
                   {folder.name}
                 </option>
               ))}
@@ -149,8 +148,8 @@ export default class AddNote extends React.Component {
               </div>
             )}
           </div>
-          <div className='buttons'>
-            <button type='submit'>Add note</button>
+          <div className="buttons">
+            <button type="submit">Add note</button>
           </div>
         </NotefulForm>
         {this.state.error && (
@@ -166,5 +165,5 @@ export default class AddNote extends React.Component {
 AddNote.propTypes = {
   name: PropTypes.string,
   content: PropTypes.string,
-  folder: PropTypes.string
+  folder: PropTypes.string,
 };
